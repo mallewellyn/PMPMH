@@ -87,7 +87,7 @@ midpoint_func<-function(q, delta.e, t){
 #calculate midpoint integration
 midpoint_int_func_system<-function(mpoints, bin.len, theta, t){
   if(t==1){
-    dens=sapply(mpoints[[1]], log_state_dens, t-1, theta=theta) + log(bin.len[[1]])
+    dens=sapply(mpoints[[1]], log_state_dens, 1, theta=theta) + log(bin.len[[1]])
   } else {
     reformat<-function(mpminus, mp) log_state_dens(c(numeric(t-2), mpminus, mp), t, theta)
     vreformat<-Vectorize(reformat, vectorize.args = c("mpminus", "mp"))
