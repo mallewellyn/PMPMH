@@ -23,12 +23,12 @@ correct_thresh<-function(row, thresh){
   row/sum(row)
 }
 
-gen_HMM<-function(y, N, q1, qN, sigma, states_curr, theta_curr, delta.e, thresh){
+gen_HMM<-function(y, N, q1, qN, var.infl, states_curr, theta_curr, delta.e, thresh){
   len.y<-length(y)
   N.adapt<-numeric(len.y)
   perc<-seq(q1, qN, by=(qN-q1)/(N-2))
 
-  q<-quantile_func(perc, 1, states_curr, y, theta_curr, sigma)
+  q<-quantile_func(perc, 1, states_curr, y, theta_curr, var.infl)
   mps_extracted<-midpoint_func(q, delta.e, 1)
 
   N.adapt[1]<-mps_extracted$N.adapt
@@ -52,7 +52,7 @@ gen_HMM<-function(y, N, q1, qN, sigma, states_curr, theta_curr, delta.e, thresh)
 
   for(t in 2:len.y){
 
-    q=quantile_func(perc, t, states_curr, y, theta_curr, sigma)
+    q=quantile_func(perc, t, states_curr, y, theta_curr, var.infl)
     mps_extracted<-midpoint_func(q, delta.e, t)
 
     N.adapt[t]<-mps_extracted$N.adapt

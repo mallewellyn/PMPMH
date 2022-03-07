@@ -1,3 +1,6 @@
+source("gen_HMM.R")
+source("gen_proposal.R")
+
 find_curr_index<-function(states, Quants){
   inters<-matrix(c(-Inf, rep(Quants, each=2), Inf), nrow=2, byrow=FALSE)
   index=which(inters[2,which(inters[1,]<states)]>=states)
@@ -27,13 +30,13 @@ gen_pacc<-function(block, prop, states_curr, theta_curr){
   pacc
 }
 
-PMPMH<-function(states_curr, y, blocks, N, q1, qN, sigma, theta_curr, delta.e, thresh){
+PMPMH<-function(states_curr, y, blocks, N, q1, qN, var.infl, theta_curr, delta.e, thresh){
 
 
   pacc_states<-numeric(dim(blocks)[1])
   states_prop<-numeric(length(y))
 
-  grid=gen_HMM(y, N, q1, qN, sigma, states_curr, theta_curr, delta.e, thresh)
+  grid=gen_HMM(y, N, q1, qN, var.infl, states_curr, theta_curr, delta.e, thresh)
 
   for(l in 1:dim(blocks)[1]){
     proposal<-gen_proposal(blocks[l,], grid, states_curr)

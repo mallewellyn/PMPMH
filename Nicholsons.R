@@ -1,71 +1,62 @@
 source("run_MH.R")
 source("gen_blocks.R")
-library(invgamma)
-library(truncnorm)
 
 
-##################### user defined ##########################
 set.seed(66)
-n=600
-x=numeric(n)
+n=100
+N=numeric(n)
+R=numeric(n)
+S=numeric(n)
 y=numeric(n)
-mu.prior=1
-sigma.epsilon=1
-jump.prop=0.90
-sigma.eta.large=700
-sigma.eta.small=1
+tau=5
+P=50
+N0=50
+delta=0.9
+phi=1
+sigma2.e=1
+sigma2.epsilon=1
+e=rgamma(n, 1/sigma2.e, rate=1/sigma2.e)
+epsilon=rgamma(n, 1/sigma2.epsilon, rate=1/sigma2.epsilon)
+#e=100
+#epsilon=10
 
-u=runif(n)
-if(u[1]<jump.prop){
-  x[1]=rnorm(1, mu.prior, sqrt(sigma.eta.small))
-} else {
-  x[1]=rnorm(1, mu.prior, sqrt(sigma.eta.large))
+S[1]=rbinom(1, N0, exp(-delta*epsilon[1]))
+N[1]=S[1]
+for(t in 2:(tau)){
+  S[t]=rbinom(1, N[t-1], exp(-delta*epsilon[t]))
+  N[t]=S[t]
 }
-y[1]=rnorm(1, x[1], sqrt(sigma.epsilon))
-for(i in 2:n){
-  if(u[i]<jump.prop){
-    x[i]=rnorm(1, x[i-1], sqrt(sigma.eta.small))
-  } else {
-    x[i]=rnorm(1, x[i-1], sqrt(sigma.eta.large))
-  }
-  y[i]=rnorm(1, x[i], sqrt(sigma.epsilon))
+S[tau+1]=rbinom(1, N[tau], exp(-delta*epsilon[tau+1]))
+R[tau+1]=rpois(1, P*N0*e[tau+1]*exp(-1))
+N[tau+1]=S[tau+1]+R[tau+1]
+for(i in (tau+2):n){
+  R[i]=rpois(1, P*N[i-tau-1]*e[i]*exp(-N[i-tau-1]/N0))
+  S[i]=rbinom(1, N[i-1], exp(-delta*epsilon[i]))
+  N[i]=R[i]+S[i]
+}
+for(i in 1:n){
+  y[i]=rpois(1, phi*N[i])
 }
 
 
-Nits=1e4
-l=4
-N=10
+Nits=5e4
+l=3
+N=25
 q1=0.1
 qN=1-0.1
-var.infl=1
-delta.e=0.25
+sigma=10
+delta.e=2
 thresh=1/100
 end.prop.var=10
 l=4
 states.init=rep(1, length(y))
 theta.init<-rep(0.5, 4)
 
-##################### user defined log observation and state density functions
-log_obs_dens<-function(y, states, t, theta){
-
-  dnorm(y[t], states[t], sqrt(theta[4]), log=TRUE)
-
-} ## fixed input and output
-log_state_dens<-function(states, t, theta){
-  if(t==1){
-    log(theta[3]*dnorm(states[t], 1, sqrt(theta[1])) + (1-theta[3])*dnorm(states[t], 1, sqrt(theta[2])))
-  } else {
-    log(theta[3]*dnorm(states[t], states[t-1], sqrt(theta[1])) + (1-theta[3])*dnorm(states[t], states[t-1], sqrt(theta[2])))
-  }
-} ## fixed input and output
-
 ################ user-defined quantile function
-#calculate quantiles
-quantile_func<-function(perc, t, states_curr, y, theta, var.infl){
-  quants=qnorm(perc, states_curr[t], sqrt(var.infl))
+quantile_func<-function(perc, t, states_curr, y, theta, sigma){
+  quants=qnorm(perc, states_curr[t], sqrt(sigma))
   unique(quants)
 }
-#calculate midpoints
 midpoint_func<-function(q, delta.e, t){
   N.adapt<-length(q)+1
 
@@ -84,28 +75,32 @@ midpoint_func<-function(q, delta.e, t){
   return(list("N.adapt"=N.adapt, "mp"=mp, "len.cell"=len.cell))
 }
 
-#calculate midpoint integration
 midpoint_int_func_system<-function(mpoints, bin.len, theta, t){
   if(t==1){
-    dens=sapply(mpoints[[1]], log_state_dens, t-1, theta=theta) + log(bin.len[[1]])
+    dens=sapply(mpoints[[1]], log_state_dens, t=1, theta=theta)
   } else {
-    reformat<-function(mpminus, mp) log_state_dens(c(numeric(t-2), mpminus, mp), t, theta)
-    vreformat<-Vectorize(reformat, vectorize.args = c("mpminus", "mp"))
-    dens=outer(mpoints[[t-1]], mpoints[[t]], vreformat)
-    dens=dens+bin.len[[t-1]]
-    dens=t(t(dens) + bin.len[[t]])
+    dens=matrix(rep(0, length(mpoints[[t-1]])*length(mpoints[[t]])), ncol=length(mpoints[[t]]))
+    for(j in 1:length(mpoints[[t-1]])){
+      for(i in 1:length(mpoints[[t]])){
+        temp<-numeric(t)
+        temp[t-1]=mpoints[[t-1]][j]
+        temp[t]=mpoints[[t]][i]
+        dens[j,i]=log_state_dens(temp, t, theta)
+      }
     }
+  }
 
-  dens
+  mass=dens + log(bin.len[[t]])
+  mass
 
 }
 midpoint_int_func_obs<-function(y, mpoints, bin.len, theta, t){
-  reformat<-function(mp, t) log_obs_dens(y, c(numeric(t-1), mp), t, theta)
-
-  sapply(mpoints[[t]], reformat, t=t) + log(bin.len[[t]])
-
+  mass=numeric(length(mpoints[[t]]))
+  for(i in 1:length(mpoints[[t]])){
+    mass[i]=log_obs_dens(y, c(numeric(t-1), mpoints[[t]][i]), t, theta)
+  }
+  mass + log(bin.len[[t]])
 }
-
 ########################## scheme for updating theta
 prop_lim<-c(1, 1, 1, 1)
 beta.sigma=2
@@ -173,6 +168,19 @@ theta_update<-function(states, theta){
   theta_curr
 } ## fixed input and output
 
+##################### log observation and state density functions
+log_obs_dens<-function(y, states, t, theta){
+
+  dnorm(y[t], states[t], sqrt(theta[4]), log=TRUE)
+
+} ## fixed input and output
+log_state_dens<-function(states, t, theta){
+  if(t==1){
+    log(theta[3]*dnorm(states[t], 1, sqrt(theta[1])) + (1-theta[3])*dnorm(states[t], 1, sqrt(theta[2])))
+  } else {
+    log(theta[3]*dnorm(states[t], states[t-1], sqrt(theta[1])) + (1-theta[3])*dnorm(states[t], states[t-1], sqrt(theta[2])))
+  }
+} ## fixed input and output
 
 ###################### proposal distribution for the states
 end_grid_cell_prop<-function(const, end.prop.var){
@@ -214,15 +222,15 @@ states_curr[1,]<-states.init
 theta_curr[1,]<-theta.init
 
 for(i in 2:Nits){
-    #update states
-    run_it<-PMPMH(states_curr[i-1,], y, blocks, N, q1, qN, var.infl, theta_curr[i-1,], delta.e, thresh)
-    states_curr[i,]<-run_it$states
-    states_prop[i,]<-run_it$`proposed states`
-    pacc_states[i,]<-run_it$states_pacc
+  #update states
+  run_it<-PMPMH(states_curr[i-1,], y, blocks, N, q1, qN, sigma, theta_curr[i-1,], delta.e, thresh)
+  states_curr[i,]<-run_it$states
+  states_prop[i,]<-run_it$`proposed states`
+  pacc_states[i,]<-run_it$states_pacc
 
-    #update theta
-    theta_curr[i,]<-theta_update(states_curr[i,], theta_curr[i-1,])
-  }
+  #update theta
+  theta_curr[i,]<-theta_update(states_curr[i,], theta_curr[i-1,])
+}
 
 
 
