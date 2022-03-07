@@ -1,5 +1,5 @@
-source("/home/s1521656/OneDrive/PMPMH paper/Code/PMPMH/R/Github_code/run_MH.R")
-source("/home/s1521656/OneDrive/PMPMH paper/Code/PMPMH/R/Github_code/gen_blocks.R")
+source("run_MH.R")
+source("gen_blocks.R")
 library(invgamma)
 
 
