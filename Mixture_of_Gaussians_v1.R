@@ -39,12 +39,12 @@ q1=0.1
 qN=1-0.1
 var.infl=1
 delta.e=0.25
-thresh=1/100
-end.prop.var=10
-l=4
+thresh=0
+end.prop.var=5
 states.init=rep(1, length(y))
 theta.init<-rep(0.5, 4)
-
+approach=3
+state_lag=1
 ##################### user defined log observation and state density functions
 log_obs_dens<-function(y, states, t, theta){
 
@@ -85,16 +85,18 @@ midpoint_func<-function(q, delta.e, t){
 }
 
 #calculate midpoint integration
-midpoint_int_func_system<-function(mpoints, bin.len, theta, t){
+midpoint_int_func_system<-function(mpoints, bin.len, theta, t, state_lag){
+  reformat<-function(mpminus, mp) log_state_dens(c(numeric(t-2), mpminus, mp), t, theta)
+  vreformat<-Vectorize(reformat, vectorize.args = c("mpminus", "mp"))
+
   if(t==1){
-    dens=sapply(mpoints[[1]], log_state_dens, 1, theta=theta) + log(bin.len[[1]])
+    dens=sapply(mpoints[[1]], log_state_dens, t=1, theta=theta) + log(bin.len[[1]])
   } else {
-    reformat<-function(mpminus, mp) log_state_dens(c(numeric(t-2), mpminus, mp), t, theta)
-    vreformat<-Vectorize(reformat, vectorize.args = c("mpminus", "mp"))
-    dens=outer(mpoints[[t-1]], mpoints[[t]], vreformat)
-    dens=dens+bin.len[[t-1]]
+    dens=outer(mpoints[[t-state_lag]], mpoints[[t]], vreformat)
+    dens=dens+bin.len[[t-state_lag]]
     dens=t(t(dens) + bin.len[[t]])
-    }
+  }
+
 
   dens
 
@@ -176,21 +178,20 @@ theta_update<-function(states, theta){
 
 ###################### proposal distribution for the states
 end_grid_cell_prop<-function(const, end.prop.var){
-  const + rnorm(1, 0, sqrt(end.prop.var))
+  rtruncnorm(1, a=const, b=Inf, mean=const, sqrt(end.prop.var))
 }
 start_grid_cell_prop<-function(const, end.prop.var){
-  const - rnorm(1, 0, sqrt(end.prop.var))
+  rtruncnorm(1, a=-Inf, b=const, mean=const, sqrt(end.prop.var))
 }
 mid_grid_cell_prop<-function(lower_quant, upper_quant){
   runif(1, lower_quant, upper_quant)
 }
 
 end_grid_cell_dens<-function(prop.state, const, end.prop.var){
-  #log density
-  dnorm(prop.state-const, 0, sqrt(end.prop.var), log=TRUE)
+  log(dtruncnorm(prop.state, a=const, b=Inf, mean=const, sqrt(end.prop.var)))
 }
 start_grid_cell_dens<-function(prop.state, const, end.prop.var){
-  dnorm(const-prop.state, 0, sqrt(end.prop.var), log=TRUE)
+  log(dtruncnorm(prop.state, a=-Inf, b=const, mean=const, sqrt(end.prop.var)))
 }
 mid_grid_cell_dens<-function(prop.state, lower_quant, upper_quant){
   dunif(prop.state, lower_quant, upper_quant, log=TRUE)
@@ -202,7 +203,6 @@ len.y<-length(y)
 
 bl<-gen_blocks(l, len.y)
 blocks=bl$blocks
-blocksize=bl$blocksize
 
 
 states_curr<-matrix(rep(0, len.y*Nits), nrow=Nits)
@@ -215,13 +215,15 @@ theta_curr[1,]<-theta.init
 
 for(i in 2:Nits){
     #update states
-    run_it<-PMPMH(states_curr[i-1,], y, blocks, N, q1, qN, var.infl, theta_curr[i-1,], delta.e, thresh)
+    run_it<-PMPMH(states_curr[i-1,], y, blocks, N, q1, qN, var.infl, theta_curr[i-1,], delta.e, thresh, approach, state_lag)
     states_curr[i,]<-run_it$states
     states_prop[i,]<-run_it$`proposed states`
     pacc_states[i,]<-run_it$states_pacc
 
     #update theta
     theta_curr[i,]<-theta_update(states_curr[i,], theta_curr[i-1,])
+
+    print(i)
   }
 
 
