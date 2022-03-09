@@ -32,17 +32,17 @@ for(i in 2:n){
 }
 
 
-Nits=1e4
+Nits=1e5
 l=4
 N=10
-q1=0.1
-qN=1-0.1
+q1=0.3
+qN=1-q1
 var.infl=1
 delta.e=0.25
 thresh=0
 end.prop.var=5
 states.init=rep(1, length(y))
-theta.init<-rep(0.5, 4)
+theta.init<-c(5, 100, 0.5, 5)
 approach=3
 state_lag=1
 ##################### user defined log observation and state density functions
@@ -109,7 +109,7 @@ midpoint_int_func_obs<-function(y, mpoints, bin.len, theta, t){
 }
 
 ########################## scheme for updating theta
-prop_lim<-c(1, 1, 1, 1)
+prop_lim<-c(1.6, 80, 0.3, 1)
 beta.sigma=2
 gamma.sigma=2
 beta.small=2
@@ -130,8 +130,8 @@ theta_update<-function(states, theta){
   ## first p
   theta_prop[3]<-runif(1, theta_curr[3]-prop_lim[3], theta_curr[3]+prop_lim[3])
   if(theta_prop[3]>0 && theta_prop[3]<1){
-    pacc[3]<-min(1, exp( sum(sapply(seq(1, len.y, by=1), log_state_dens, states=states, theta=theta_curr)) -
-                           sum(sapply(seq(1, len.y, by=1), log_state_dens, states=states, theta=theta_prop))))
+    pacc[3]<-min(1, exp(sum(sapply(seq(1, len.y, by=1), log_state_dens, states=states, theta=theta_prop)) -
+                           sum(sapply(seq(1, len.y, by=1), log_state_dens, states=states, theta=theta_curr))))
 
   }
   if(runif(1)<pacc[3]){
@@ -156,7 +156,7 @@ theta_update<-function(states, theta){
 
   ## sigma eta large
   theta_prop[2]<-runif(1, theta_curr[2]-prop_lim[2], theta_curr[2]+prop_lim[2])
-  if(theta_prop[2]>theta_curr[2]){
+  if(theta_prop[2]>theta_curr[1]){
     pacc[2]<-min(1, exp(log_prior_density_sigmalarge(theta_prop[2], beta.large, gamma.large) +
                           sum(sapply(seq(1, len.y, by=1), log_state_dens, states=states, theta=theta_prop)) -
                           log_prior_density_sigmalarge(theta_curr[2], beta.large, gamma.large) -
@@ -216,11 +216,12 @@ theta_curr[1,]<-theta.init
 for(i in 2:Nits){
     #update states
     run_it<-PMPMH(states_curr[i-1,], y, blocks, N, q1, qN, var.infl, theta_curr[i-1,], delta.e, thresh, approach, state_lag)
+
     states_curr[i,]<-run_it$states
     states_prop[i,]<-run_it$`proposed states`
     pacc_states[i,]<-run_it$states_pacc
 
-    #update theta
+    #update parameters
     theta_curr[i,]<-theta_update(states_curr[i,], theta_curr[i-1,])
 
     print(i)
