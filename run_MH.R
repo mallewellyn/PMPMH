@@ -1,11 +1,6 @@
 source("gen_HMM.R")
 source("gen_proposal.R")
 
-find_curr_index<-function(states, Quants){
-  inters<-matrix(c(-Inf, rep(Quants, each=2), Inf), nrow=2, byrow=FALSE)
-  index=which(inters[2,which(inters[1,]<states)]>=states)
-  index
-}
 
 gen_pacc<-function(block, prop, states_curr, theta_curr, state_lag){
   states_prop<-states_curr

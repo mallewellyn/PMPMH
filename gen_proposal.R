@@ -1,3 +1,7 @@
+find_curr_index<-function(t, states_curr, quants){
+  findInterval(states_curr[t], vec=c(-Inf, quants[[t]], Inf), left.open = TRUE)
+}
+
 
 sample_HMM<-function(states_curr, y, block, grid, end.prop.var, state_lag){
   transition=grid$Transition
@@ -8,39 +12,38 @@ sample_HMM<-function(states_curr, y, block, grid, end.prop.var, state_lag){
   blocksize=length(block)
   len.y=length(y)
 
-  index.curr<-numeric(len.y)
-  for(k in block){
-    index.curr[k]<-find_curr_index(states_curr[k], quants[[k]])
-  }
-
+  index.curr=numeric(len.y)
   index.samp<-numeric(len.y)
   states_prop<-numeric(len.y)
   filt<-as.list(NULL)
 
+  index.curr[block]=sapply(block, find_curr_index, states_curr=states_curr, quants=quants)
+
+
   filt_temp<-transition[[block[1]]]*observation[[block[1]]]
-  filt_temp<-norm_rows(filt_temp)
+  filt_temp<-norm_rows(log(filt_temp))
 
   filt[[block[1]]]=filt_temp
 
   for(i in 2:blocksize){
     filt_temp<-(filt[[block[i-1]]] %*% transition[[block[i]]])*observation[[block[i]]]
-    filt_temp<-norm_rows(filt_temp)
+    filt_temp<-norm_rows(log(filt_temp))
     filt[[block[i]]]=filt_temp
   }
 
   ## sampling
-  if(len.y==block[blocksize]){
+  if(block[blocksize]==len.y){
     smooth=filt[[block[blocksize]]]
   } else {
     smooth<-filt[[block[blocksize]]]*transition[[block[blocksize]+state_lag]]
   }
-  smooth<-norm_rows(smooth)
-  index.samp[block[blocksize]]<-which((runif(1)-(cumsum(smooth)/cumsum(smooth)[length(smooth)])<0))[1]
+  smooth<-norm_rows(log(smooth))
+  index.samp[block[blocksize]]<-sample(1:N.adapt[block[blocksize]], size=1, prob=smooth)
 
   for(i in rev(block[-blocksize])){
     smooth<-filt[[i]]*transition[[i+state_lag]][,index.samp[i+state_lag]]
-    smooth<-norm_rows(smooth)
-    index.samp[i]<-which((runif(1)-(cumsum(smooth)/cumsum(smooth)[length(smooth)])<0))[1]
+    smooth<-norm_rows(log(smooth))
+    index.samp[i]<-sample(1:N.adapt[i], size=1, prob=smooth)
   }
 
   #proposal and current probability calculations
@@ -95,4 +98,5 @@ sample_HMM<-function(states_curr, y, block, grid, end.prop.var, state_lag){
   }
   return(list("index.samp"=index.samp, "states_prop"=states_prop, "log.prob.new"=log.prob.new, "log.prob.curr"=log.prob.curr))
 }
+
 
