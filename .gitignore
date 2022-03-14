@@ -4,3 +4,5 @@
 .Ruserdata
 PAT.R
 proposal_density_probs_checks.R
+Mixture_of_Gaussians_EDDIEFILE.R
+checks.R

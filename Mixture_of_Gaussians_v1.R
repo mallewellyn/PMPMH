@@ -30,19 +30,20 @@ for(i in 2:n){
   }
   y[i]=rnorm(1, x[i], sqrt(sigma.epsilon))
 }
+set.seed()
 
 
-Nits=1e5
-l=4
+Nits=1e4
+l=10
 N=10
-q1=0.3
+q1=0.001
 qN=1-q1
-var.infl=1
+var.infl=10
 delta.e=0.25
 thresh=0
 end.prop.var=5
-states.init=rep(1, length(y))
-theta.init<-c(5, 100, 0.5, 5)
+states.init=y
+theta.init<-c(5, 5, 0.5, 5)
 approach=3
 state_lag=1
 ##################### user defined log observation and state density functions
@@ -109,7 +110,7 @@ midpoint_int_func_obs<-function(y, mpoints, bin.len, theta, t){
 }
 
 ########################## scheme for updating theta
-prop_lim<-c(1.6, 80, 0.3, 1)
+prop_lim<-c(1, 80, 0.15, 1)
 beta.sigma=2
 gamma.sigma=2
 beta.small=2
@@ -200,7 +201,6 @@ mid_grid_cell_dens<-function(prop.state, lower_quant, upper_quant){
 
 ################## run algorithm
 len.y<-length(y)
-
 bl<-gen_blocks(l, len.y)
 blocks=bl$blocks
 
@@ -222,30 +222,6 @@ for(i in 2:Nits){
     pacc_states[i,]<-run_it$states_pacc
 
     #update parameters
-    #theta_curr[i,]<-theta_update(states_curr[i,], theta_curr[i-1,])
-    theta_curr[i,]<-c(sigma.eta.small, sigma.eta.large, jump.prop, sigma.epsilon)
+    theta_curr[i,]<-theta_update(states_curr[i,], theta_curr[i-1,])
     print(i)
-  }
-
-t=1
-plot.ts(states_curr[,t][1:i])
-lines(states10_1[,t][1:i], col="blue")
-lines(states_prop[,t][1:i], col="red")
-lines(rep(x[t], i), col="orange")
-mean(pacc_states[1:i,])
-
-var(states10_1[,t][4000:7000])
-var(states_curr[,t][4000:7000])
-var(states7_1[,t][4000:7000])
-
-t=10
-plot.ts(states_10_1[,t+1][1:7750])
-lines(states_10_2[,t][1:7750], col="red")
-lines(rep(x[t], 7750), col="orange")
-lines(rep(states_curr[1,t], 7750), col="red")
-
-
-write.csv(states_curr, file="/home/s1521656/OneDrive/PMPMH paper/checks/states_N10_q103_var1_l4_fixedparams.csv")
-write.csv(states_prop, file="/home/s1521656/OneDrive/PMPMH paper/checks/statesprop_N10_q103_var1_l4_fixedparams.csv")
-
-states_10_1<-read.csv(file="/home/s1521656/OneDrive/PMPMH paper/checks/states_N10_q10001_var5_l4_fixedparams.csv")
+}
