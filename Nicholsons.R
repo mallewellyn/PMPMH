@@ -175,6 +175,8 @@ phi.b=0.01
 
 
 prop.lim=c(0.1, 10, 1, 1/3, 1)
+prop.epsilon=2
+prop.e=4
 
 log_prior_density_delta<-function(val, delta.a, delta.b){
   dgamma(val, delta.a, rate=delta.b, log=TRUE)
