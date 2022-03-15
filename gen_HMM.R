@@ -30,13 +30,18 @@ gen_HMM<-function(block, y, N, q1, qN, var.infl, states_curr, theta_curr, delta.
   transition=as.list(NULL)
   observation=as.list(NULL)
 
+  if(block[1]-state_lag>0){
+    mpoints[[block[1]-state_lag]]=states_curr[block[1]-state_lag]
+    bin.len[[block[1]-state_lag]]=1
+  }
+
   len.block<-length(block)
   len.y<-length(y)
   N.adapt<-numeric(len.y)
   perc<-seq(q1, qN, by=(qN-q1)/(N-2))
 
   q<-quantile_func(perc, block[1], states_curr, y, theta_curr, var.infl)
-  mps_extracted<-midpoint_func(q, delta.e, 1)
+  mps_extracted<-midpoint_func(q, delta.e, block[1])
 
   N.adapt[block[1]]<-mps_extracted$N.adapt
   mp<-mps_extracted$mp
@@ -46,10 +51,6 @@ gen_HMM<-function(block, y, N, q1, qN, var.infl, states_curr, theta_curr, delta.
   mpoints[[block[1]]]=mp
   bin.len[[block[1]]]=len.cell
 
-  if(block[1]>1){
-    mpoints[[block[1]-state_lag]]=states_curr[block[1]-state_lag]
-    bin.len[[block[1]-state_lag]]=1
-  }
 
   tr=midpoint_int_func_system(mpoints, bin.len, theta_curr, block[1], state_lag)
   tr<-norm_rows(tr)
@@ -62,7 +63,10 @@ gen_HMM<-function(block, y, N, q1, qN, var.infl, states_curr, theta_curr, delta.
   transition[[block[1]]]=tr
   observation[[block[1]]]=ob
 
-  for(t in block[-1]){
+  t=block[1]
+
+  if(length(na.omit(block[-1]))>0){
+  for(t in na.omit(block[-1])){
 
     q=quantile_func(perc, t, states_curr, y, theta_curr, var.infl)
     mps_extracted<-midpoint_func(q, delta.e, t)
@@ -93,12 +97,15 @@ gen_HMM<-function(block, y, N, q1, qN, var.infl, states_curr, theta_curr, delta.
     observation[[t]]=ob
 
   }
+  }
 
-  if(t<length(y)){
-    mpoints[[block[length(block)] + state_lag]]=states_curr[block[length(block)] + state_lag]
-    bin.len[[block[length(block)] + state_lag]]=1
+  if(t+state_lag<=length(y)){
+    i=block[length(block)] + state_lag
 
-    tr<-midpoint_int_func_system(mpoints, bin.len, theta_curr, block[length(block)]+state_lag, state_lag)
+    mpoints[[i]]=states_curr[i]
+    bin.len[[i]]=1
+
+    tr<-midpoint_int_func_system(mpoints, bin.len, theta_curr, i, state_lag)
     if(is.matrix(tr)){
       tr<-t(apply(tr, MARGIN=1, norm_rows))
       tr<-t(apply(tr, MARGIN=1, correct_thresh, thresh=thresh))
@@ -107,7 +114,8 @@ gen_HMM<-function(block, y, N, q1, qN, var.infl, states_curr, theta_curr, delta.
       tr<-correct_thresh(tr, thresh=thresh)
     }
 
-    transition[[block[length(block)] + state_lag]]=tr
+    transition[[i]]=tr
+
   }
 
 

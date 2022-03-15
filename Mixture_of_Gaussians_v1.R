@@ -30,17 +30,17 @@ for(i in 2:n){
   }
   y[i]=rnorm(1, x[i], sqrt(sigma.epsilon))
 }
-set.seed()
+set.seed(NULL)
 
 
 Nits=1e4
-l=10
+l=4
 N=10
-q1=0.001
+q1=0.2
 qN=1-q1
-var.infl=10
+var.infl=3
 delta.e=0.25
-thresh=0
+thresh=0.001
 end.prop.var=5
 states.init=y
 theta.init<-c(5, 5, 0.5, 5)
@@ -109,7 +109,7 @@ midpoint_int_func_obs<-function(y, mpoints, bin.len, theta, t){
 
 }
 
-########################## scheme for updating theta
+########################## scheme for updatinsew3theta
 prop_lim<-c(1, 80, 0.15, 1)
 beta.sigma=2
 gamma.sigma=2
@@ -201,7 +201,7 @@ mid_grid_cell_dens<-function(prop.state, lower_quant, upper_quant){
 
 ################## run algorithm
 len.y<-length(y)
-bl<-gen_blocks(l, len.y)
+bl<-gen_blocks(l, len.y, state_lag)
 blocks=bl$blocks
 
 

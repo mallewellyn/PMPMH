@@ -1,22 +1,23 @@
-gen_blocks<-function(l, len.y){
-  split=seq(1, len.y, by=l-1)
-  while(split[length(split)]<len.y){
-    split=c(split, len.y)
+gen_blocks<-function(l, len.y, state_lag){
+  x<-matrix(seq(state_lag, state_lag-1+state_lag*l, by=1), ncol=l, nrow=state_lag)
+  i=1
+  while(max(x)<len.y){
+    x<-rbind(x, matrix(seq(x[((i-1)*state_lag+1),l], x[((i-1)*state_lag+1),l]+state_lag*l-1, by=1), ncol=l, nrow=state_lag))
+    i=i+1
   }
 
-  blocks<-matrix(seq(split[1], split[2], by=1), ncol=split[2]-split[1]+1, byrow=FALSE)
-  for(k in 2:(length(split)-2)){
-    blocks<-rbind(blocks, seq(split[k], split[k+1]))
-  }
-
-  if(max(blocks)<len.y){
-    temp=seq(split[length(split)-1], len.y, by=1)
-    while(length(temp)<l){
-      temp=c(temp, NA)
+  for(i in dim(x)[1]:1){
+    if(length(which(x[i,]>len.y))==l){
+      x=x[-i,]
+    } else {
+      if(length(which(x[i,]>len.y))>0){
+        x[i,which(x[i,]>len.y)]=NA
+      }
     }
-    blocks=rbind(blocks,temp)
+
   }
 
+  blocks=x
   find.block.size<-function(row){
     length(which(!is.na(row)))
   }
