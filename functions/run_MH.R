@@ -5,14 +5,14 @@ source("functions/gen_proposal.R")
 gen_pacc<-function(block, prop, states_curr, theta_curr, state_lag){
   states_prop<-states_curr
   states_prop[block]<-prop$states_prop[block]
-
-  if(block[1]==1){
+#differentiation between the two below not totally necessary but ensures no bugs introduced
+  if(block[1]<2*state_lag){
     t.eval.states<-c(block, max(block)+state_lag)
   }
-  if(max(block)==len.y){
+  if(max(block)+state_lag>length(y)){
     t.eval.states<-c(min(block)-state_lag, block)
   }
-  if(min(block)!=1 && max(block)!=len.y){
+  if(min(block)!=state_lag && max(block)+state_lag<=length(y)){
     t.eval.states<-c(min(block)-state_lag, block, max(block)+state_lag)
   }
 
@@ -26,7 +26,7 @@ gen_pacc<-function(block, prop, states_curr, theta_curr, state_lag){
   }
   pacc
 }
-PMPMH_1<-function(states_curr, y, blocks, N, q1, qN, var.infl, theta_curr, delta.e, thresh, approach, state_lag){
+PMPMH<-function(states_curr, y, blocks, N, q1, qN, var.infl, theta_curr, delta.e, thresh, approach, state_lag){
 
   len.y=length(y)
 
@@ -52,5 +52,5 @@ PMPMH_1<-function(states_curr, y, blocks, N, q1, qN, var.infl, theta_curr, delta
     }
   }
 
-  return(list("states"=states_curr, "proposed states"=states_prop, "states_pacc"=pacc_states))
+  return(list("states"=states_curr, "proposed states"=states_prop, "states_pacc"=pacc_states, "N.cells"=N.cells))
 }
