@@ -14,12 +14,14 @@ This repository contains code for general implementations and specific use cases
 ## Configuration/operation 
 Clone repository to preferred installation of R. Functions for general one-dimensional SSMs are already included. For implementation of examples not given in cloned implementation files, follow the implementation files as a template for supplied arguments. For further details on functionality of operations and suitable choices of tuning parameter see [].
 
-required packages: (CRAN) `invgamma', `truncnorm'. CRAN installation:
+required packages: (CRAN) `invgamma`, `truncnorm`. CRAN installation:
 
-``` #install.packages("invgamma")
+``` 
+#install.packages("invgamma")
 library(invgamma)
 #install.packages("truncnorm")
 library(truncnorm)
+```
 
 ## Copyright/permissions/licensing
 
