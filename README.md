@@ -4,11 +4,15 @@ This repository contains code for general implementations and specific use cases
 
 ## Files 
 *functions > gen_blocks.R*: generates correctly formatted block indices for block updating of the latent states.
+
 *functions > gen_HMM.R*: for a specified block of states, calculates the discrete HMM approximation to the SSM for a given set of tuning parameters.
+
 *functions > gen_proposal.R*: samples a sequence of intervals from the HMM approximation and continuous values for the state at each time point from within those intervals.
+
 *functions > run_MH.R*: runs one iteration of the M-H algorithm's accept/reject step.
 
 *implementations > Mixture_of_Gaussians.R*: use case of PMPMH method for fitting Gaussian mixture SSM to data (case study 1 in []).
+
 *implementation > Nicholsons.R*: use case of the PMPMH method for SSM fitting to data simulated from Nicholson's blowfly model (case study 2 in []).
 
 ## Configuration/operation 
@@ -23,14 +27,13 @@ library(invgamma)
 library(truncnorm)
 ```
 
-## Copyright/permissions/licensing
+## Development
+This code is maintained by Mary Llewellyn (mary.llewellyn@ed.ac.uk)
 
-## Contact information for author
-include if any contributions 
+For troubleshooting or comments, please submit an issue or e-mail.
 
-## Troubleshooting
-
-## Credits and acknowledgements 
+## Attributions
+If you find the PMPMH algorithm useful for your research, you can acknowledge by citing [].
 
 ## Update information
 [no updates: 21/03/2022]
