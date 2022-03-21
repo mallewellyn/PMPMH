@@ -26,22 +26,22 @@ gen_pacc<-function(block, prop, states_curr, theta_curr, state_lag){
   }
   pacc
 }
-
-PMPMH<-function(states_curr, y, blocks, N, q1, qN, var.infl, theta_curr, delta.e, thresh, approach, state_lag){
+PMPMH_1<-function(states_curr, y, blocks, N, q1, qN, var.infl, theta_curr, delta.e, thresh, approach, state_lag){
 
   len.y=length(y)
 
   pacc_states<-numeric(dim(blocks)[1])
   states_prop<-numeric(len.y)
+  N.cells<-numeric(dim(blocks)[1])
 
   if(approach!=3){
-  grid=gen_HMM(seq(1, len.y, by=1), y, N, q1, qN, var.infl, states_curr, theta_curr, delta.e, thresh, state_lag)
+    grid=gen_HMM(seq(1, len.y, by=1), y, N, q1, qN, var.infl, states_curr, theta_curr, delta.e, thresh, state_lag)
   }
 
   for(l in 1:dim(blocks)[1]){
     if(approach==3){
       grid=gen_HMM(na.omit(blocks[l,]), y, N, q1, qN, var.infl, states_curr, theta_curr, delta.e, thresh, state_lag)
-
+      N.cells[l]=mean(grid$"Number bins"[na.omit(blocks[l,])])
     }
     proposal<-sample_HMM(states_curr, y, na.omit(blocks[l,]), grid, end.prop.var, state_lag)
     pacc_states[l]<-gen_pacc(na.omit(blocks[l,]), proposal, states_curr, theta_curr, state_lag)
@@ -54,4 +54,3 @@ PMPMH<-function(states_curr, y, blocks, N, q1, qN, var.infl, theta_curr, delta.e
 
   return(list("states"=states_curr, "proposed states"=states_prop, "states_pacc"=pacc_states))
 }
-

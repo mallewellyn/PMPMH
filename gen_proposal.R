@@ -42,10 +42,12 @@ sample_HMM<-function(states_curr, y, block, grid, end.prop.var, state_lag){
   smooth<-norm_rows(log(smooth))
   index.samp[block[blocksize]]<-sample(1:N.adapt[block[blocksize]], size=1, prob=smooth)
 
+  if(blocksize>1){
   for(i in rev(na.omit(block[-blocksize]))){
     smooth<-filt[[i]]*transition[[i+state_lag]][,index.samp[i+state_lag]]
     smooth<-norm_rows(log(smooth))
     index.samp[i]<-sample(1:N.adapt[i], size=1, prob=smooth)
+  }
   }
 
   #proposal and current probability calculations
@@ -65,8 +67,7 @@ sample_HMM<-function(states_curr, y, block, grid, end.prop.var, state_lag){
   log.prob.new<-log(transition[[block[1]]][index.samp[block[1]]]) +
     log(observation[[block[1]]][index.samp[block[1]]])
   if(blocksize>1){
-    log.prob.new=log.prob.new +
-    sum(sapply(block[-1], prob_calc, index=index.samp))
+    log.prob.new=log.prob.new + sum(sapply(na.omit(block[-1]), prob_calc, index=index.samp))
   }
 
   if(block[blocksize]+state_lag<=len.y){

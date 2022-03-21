@@ -7,3 +7,5 @@ proposal_density_probs_checks.R
 Mixture_of_Gaussians_EDDIEFILE.R
 checks.R
 Nicholsons_EDDIEFILE.R
+run_MH1.R
+Mixture_of_Gaussians_v1.R
