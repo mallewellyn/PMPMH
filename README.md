@@ -16,7 +16,7 @@ This repository contains code for general implementations and specific use cases
 *implementation > Nicholsons.R*: use case of the PMPMH method for SSM fitting to data simulated from Nicholson's blowfly model (case study 2 in []).
 
 ## Configuration/operation 
-Clone repository to preferred installation of R. Functions for general one-dimensional SSMs are already included. For implementation of examples not given in cloned implementation files, follow the implementation files as a template for supplied arguments. For further details on functionality of operations and suitable choices of tuning parameter see [].
+Clone repository to preferred installation of R. Functions for general one-dimensional SSMs are already included. For implementation of examples not given in cloned implementation files, follow the implementation files as a template for supplied arguments. 
 
 required packages: (CRAN) `invgamma`, `truncnorm`. CRAN installation:
 
