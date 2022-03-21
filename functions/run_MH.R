@@ -1,5 +1,5 @@
-source("gen_HMM.R")
-source("gen_proposal.R")
+source("functions/gen_HMM.R")
+source("functions/gen_proposal.R")
 
 
 gen_pacc<-function(block, prop, states_curr, theta_curr, state_lag){

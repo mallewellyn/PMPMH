@@ -1,5 +1,5 @@
-source("run_MH.R")
-source("gen_blocks.R")
+source("functions/run_MH.R")
+source("functions/gen_blocks.R")
 library(invgamma)
 library(truncnorm)
 
