@@ -1,6 +1,6 @@
 # R code for the Point Mass Proposal Metropolis-Hastings (PMPMH) algorithm
 
-This repository contains code for general implementations and specific use cases of the PMPMH algorithm in []. The PMPMH algorithm uses a hidden Markov model (HMM) approximation to a state-space model (SSM) to provide an efficient proposal distribution for the latent states, allowing Metropolis-Hastings (M-H) sampling of the latent state vector and model paramaters. 
+This repository contains code for general implementations and specific use cases of the PMPMH algorithm in [1]. The PMPMH algorithm uses a hidden Markov model (HMM) approximation to a state-space model (SSM) to provide an efficient proposal distribution for the latent states, allowing Metropolis-Hastings (M-H) sampling of the latent state vector and model parameters. 
 
 ## Files 
 *functions > gen_blocks.R*: generates correctly formatted block indices for block updating of the latent states.
@@ -11,9 +11,9 @@ This repository contains code for general implementations and specific use cases
 
 *functions > run_MH.R*: runs one iteration of the M-H algorithm's accept/reject step.
 
-*implementations > Mixture_of_Gaussians.R*: use case of PMPMH method for fitting Gaussian mixture SSM to data (case study 1 in []).
+*implementations > Mixture_of_Gaussians.R*: use case of PMPMH method for fitting Gaussian mixture SSM to data (case study 1 in [1]).
 
-*implementation > Nicholsons.R*: use case of the PMPMH method for SSM fitting to data simulated from Nicholson's blowfly model (case study 2 in []).
+*implementation > Nicholsons.R*: use case of the PMPMH method for SSM fitting to data simulated from Nicholson's blowfly model (case study 2 in [1]).
 
 ## Configuration/operation 
 Clone repository to preferred installation of R. Functions for general one-dimensional SSMs are already included. For implementation of examples not given in cloned implementation files, follow the implementation files as a template for supplied arguments. 
@@ -33,7 +33,11 @@ This code is maintained by Mary Llewellyn (mary.llewellyn@ed.ac.uk)
 For troubleshooting or comments, please submit an issue or e-mail.
 
 ## Attributions
-If you find the PMPMH algorithm useful for your research, you can acknowledge by citing [].
+If you find the PMPMH algorithm useful for your research, you can acknowledge by citing [1].
 
 ## Update information
 [no updates: 21/03/2022]
+
+## References 
+[1]
+
