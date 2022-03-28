@@ -39,5 +39,5 @@ If you find the PMPMH algorithm useful for your research, you can acknowledge by
 [no updates: 21/03/2022]
 
 ## References 
-[1]
+[1] Llewellyn, M., King, R., Elvira, V., and Ross, G. (2022). A Point Mass Proposal Method for Bayesian State-Space Model Fitting. *https://doi.org/10.48550/arXiv.2203.13649* (Author's Original Manuscript)
 
