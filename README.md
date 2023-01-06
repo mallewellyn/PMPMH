@@ -12,9 +12,9 @@ This repository contains code for general implementations and specific use cases
 *PMPMH/functions/run_MH.R*: runs one iteration of the M-H algorithm's accept/reject step.
  
 
-*PMPMH/implementations/PMPMH_GaussMix_\*.R*: use cases of PMPMH method for fitting Gaussian mixture SSMs to data (both models in case study 1 of [1]).
+*PMPMH/implementations/PMPMH_GaussMix_\*.R*: use cases of PMPMH method for fitting Gaussian mixture SSMs to data (both models in first numerical illustration of [1]).
 
-*implementation/PMPMH_Nicholsons.R*: use case of the PMPMH method for SSM fitting to data simulated from Nicholson's blowfly model (2-dimensional case study 2 of [1]).
+*implementation/PMPMH_Nicholsons.R*: use case of the PMPMH method for SSM fitting to data simulated from Nicholson's blowfly model (2-dimensional numerical illustration of [1]).
  
 
 *PG/\*.R*: implementations of the particle Gibbs algorithm (both case studies in [1]). Code based on https://github.com/nchopin/particles.
@@ -48,6 +48,6 @@ If you find the PMPMH algorithm useful for your research, you can acknowledge by
 ## References 
 [1] 
 
-[2] Lindsten, F., Jordan, M. I., and Sch ̈on, T. B. (2014). Particle Gibbs with Ancestor Sampling. Journal of Machine Learning Research, 15(63):2145–2184.
+[2] Lindsten, F., Jordan, M. I., and Schön, T. B. (2014). Particle Gibbs with Ancestor Sampling. Journal of Machine Learning Research, 15(63):2145–2184.
 
 
