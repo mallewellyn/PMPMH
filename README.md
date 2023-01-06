@@ -14,7 +14,7 @@ This repository contains code for general implementations and specific use cases
 
 *PMPMH/implementations/PMPMH_GaussMix_\*.R*: use cases of PMPMH method for fitting Gaussian mixture SSMs to data (both models in first numerical illustration of [1]).
 
-*implementation/PMPMH_Nicholsons.R*: use case of the PMPMH method for SSM fitting to data simulated from Nicholson's blowfly model (2-dimensional numerical illustration of [1]).
+*PMPMH/implementation/PMPMH_Nicholsons.R*: use case of the PMPMH method for SSM fitting to data simulated from Nicholson's blowfly model (2-dimensional numerical illustration of [1]).
  
 
 *PG/\*.R*: implementations of the particle Gibbs algorithm (both case studies in [1]). Code based on github.com/nchopin/particles.
