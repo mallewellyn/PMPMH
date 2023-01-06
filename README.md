@@ -10,12 +10,12 @@ This repository contains code for general implementations and specific use cases
 *PMPMH/functions/gen_proposal.R*: samples a sequence of intervals from the HMM approximation and continuous values for the state at each time point from within those intervals.
 
 *PMPMH/functions/run_MH.R*: runs one iteration of the M-H algorithm's accept/reject step.
-
+ 
 
 *PMPMH/implementations/PMPMH_GaussMix_[].R*: use cases of PMPMH method for fitting Gaussian mixture SSMs to data (both models in case study 1 of [1]).
 
 *implementation/PMPMH_Nicholsons.R*: use case of the PMPMH method for SSM fitting to data simulated from Nicholson's blowfly model (2-dimensional case study 2 of [1]).
-
+ 
 
 *PG/[].R*: implementations of the particle Gibbs algorithm (both case studies in [1]). Code based on https://github.com/nchopin/particles.
 
@@ -25,7 +25,8 @@ This repository contains code for general implementations and specific use cases
 ## Configuration/operation 
 Clone repository to preferred installation of R.The PMPMH functions for general one-dimensional SSMs, and two-dimensional SSMs with conditionally updated states, are already included. For the implementation of examples not given in cloned implementation files, follow the implementation files as a template for supplied arguments. 
 
-required packages: (CRAN) `invgamma`, `truncnorm`. CRAN installation:
+Required packages: (CRAN) `invgamma`, `truncnorm`. 
+CRAN installation:
 
 ``` 
 #install.packages("invgamma")
