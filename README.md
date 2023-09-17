@@ -48,7 +48,7 @@ If you find the PMPMH algorithm useful for your research, you can acknowledge by
 ## Update information
 
 ## References 
-[1] Llewellyn, M., King, R., Elvira, V., and Ross, G. (2023). A Point Mass Proposal Method for Bayesian State-Space Model Fitting. https://doi.org/10.48550/arXiv.2203.13649 (Author's Original Manuscript)
+[1] Llewellyn, M., King, R., Elvira, V. et al. A point mass proposal method for Bayesian state-space model fitting. Stat Comput 33, 111 (2023). https://doi.org/10.1007/s11222-023-10268-6
 
 [2] Lindsten, F., Jordan, M. I., and Schön, T. B. (2014). Particle Gibbs with Ancestor Sampling. Journal of Machine Learning Research, 15(63):2145–2184.
 
